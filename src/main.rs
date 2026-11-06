@@ -1,4 +1,5 @@
 mod board;
+mod render;
 mod shapes;
 
 use std::io::{self, Write, stdout};
@@ -10,6 +11,8 @@ use crossterm::terminal::{
     Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
 };
 use crossterm::{execute, style::Print};
+
+use crate::board::{Board, Cell, HEIGHT};
 
 struct TerminalGuard;
 
@@ -28,17 +31,12 @@ impl Drop for TerminalGuard {
     }
 }
 
-fn tick(counter: &mut i32) {
-    *counter += 1
+fn tick() {
+    todo!()
 }
 
-fn render(out: &mut impl Write, counter: i32) -> io::Result<()> {
-    execute!(
-        out,
-        MoveTo(0, 0),
-        Clear(ClearType::All),
-        Print(format!("counter {counter}")),
-    )?;
+fn render(out: &mut impl Write) -> io::Result<()> {
+    execute!(out, MoveTo(0, 0), Clear(ClearType::All),)?;
     Ok(())
 }
 
@@ -49,14 +47,20 @@ fn main() -> std::io::Result<()> {
     let mut last_frame = Instant::now();
     let mut acc = Duration::ZERO;
     let mut out = stdout();
-    let mut counter = 0;
+    let mut board = Board::new();
+
+    for y in 0..HEIGHT {
+        board.set(0, y, Some(Cell::T));
+    }
+
+    board.set(5, 10, Some(Cell::O));
 
     loop {
         let now = Instant::now();
         acc += now - last_frame;
         last_frame = now;
 
-        if event::poll(Duration::ZERO)?
+        if event::poll(Duration::from_millis(16))?
             && let Event::Key(key) = event::read()?
         {
             match key.code {
@@ -67,11 +71,11 @@ fn main() -> std::io::Result<()> {
         }
 
         while acc >= GRAVITY_INTERVAL {
-            tick(&mut counter); // game logic here
+            // tick(); // game logic here
             acc -= GRAVITY_INTERVAL;
         }
 
-        render(&mut out, counter)?
+        render::draw(&board, &mut out)?
     }
     Ok(())
 }
