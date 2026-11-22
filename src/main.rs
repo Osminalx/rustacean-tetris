@@ -13,6 +13,7 @@ use crossterm::terminal::{
 use crossterm::{execute, style::Print};
 
 use crate::board::{Board, Cell, HEIGHT};
+use crate::shapes::cells;
 
 struct TerminalGuard;
 
@@ -49,11 +50,23 @@ fn main() -> std::io::Result<()> {
     let mut out = stdout();
     let mut board = Board::new();
 
-    for y in 0..HEIGHT {
-        board.set(0, y, Some(Cell::T));
-    }
+    // for y in 0..HEIGHT {
+    //     board.set(0, y, Some(Cell::T));
+    // }
+    // board.set(5, 2, Some(Cell::L));
 
-    board.set(5, 10, Some(Cell::O));
+    let (origin_x, origin_y) = (5, 2);
+    let piece = cells(Cell::L);
+    for &(dx, dy) in &piece {
+        let Ok(x) = usize::try_from(origin_x + dx) else {
+            continue;
+        };
+        let Ok(y) = usize::try_from(origin_y + dy) else {
+            continue;
+        };
+
+        board.set(x, y, Some(Cell::L));
+    }
 
     loop {
         let now = Instant::now();
