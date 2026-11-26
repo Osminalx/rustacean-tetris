@@ -13,7 +13,7 @@ use crossterm::terminal::{
 use crossterm::{execute, style::Print};
 
 use crate::board::{Board, Cell, HEIGHT};
-use crate::shapes::cells;
+use crate::shapes::{Piece, cells};
 
 struct TerminalGuard;
 
@@ -49,24 +49,24 @@ fn main() -> std::io::Result<()> {
     let mut acc = Duration::ZERO;
     let mut out = stdout();
     let mut board = Board::new();
+    let mut piece = Piece {
+        kind: Cell::L,
+        x: 5,
+        y: 2,
+    };
 
-    // for y in 0..HEIGHT {
-    //     board.set(0, y, Some(Cell::T));
+    // let (origin_x, origin_y) = (5, 2);
+    // let piece = cells(Cell::L);
+    // for &(dx, dy) in &piece {
+    //     let Ok(x) = usize::try_from(origin_x + dx) else {
+    //         continue;
+    //     };
+    //     let Ok(y) = usize::try_from(origin_y + dy) else {
+    //         continue;
+    //     };
+    //
+    //     board.set(x, y, Some(Cell::L));
     // }
-    // board.set(5, 2, Some(Cell::L));
-
-    let (origin_x, origin_y) = (5, 2);
-    let piece = cells(Cell::L);
-    for &(dx, dy) in &piece {
-        let Ok(x) = usize::try_from(origin_x + dx) else {
-            continue;
-        };
-        let Ok(y) = usize::try_from(origin_y + dy) else {
-            continue;
-        };
-
-        board.set(x, y, Some(Cell::L));
-    }
 
     loop {
         let now = Instant::now();
@@ -88,7 +88,7 @@ fn main() -> std::io::Result<()> {
             acc -= GRAVITY_INTERVAL;
         }
 
-        render::draw(&board, &mut out)?
+        render::draw(&board, &piece, &mut out)?
     }
     Ok(())
 }
