@@ -13,7 +13,7 @@ use crossterm::terminal::{
 use crossterm::{execute, style::Print};
 
 use crate::board::{Board, Cell, HEIGHT};
-use crate::shapes::{Piece, cells};
+use crate::shapes::{Piece, can_place, cells};
 
 struct TerminalGuard;
 
@@ -84,7 +84,9 @@ fn main() -> std::io::Result<()> {
         }
 
         while acc >= GRAVITY_INTERVAL {
-            // tick(); // game logic here
+            if can_place(&board, &piece, piece.x, piece.y + 1) {
+                piece.y += 1;
+            }
             acc -= GRAVITY_INTERVAL;
         }
 
