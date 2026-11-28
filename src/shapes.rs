@@ -32,3 +32,15 @@ pub fn can_place(board: &Board, piece: &Piece, new_x: i32, new_y: i32) -> bool {
     }
     true
 }
+
+impl Piece {
+    pub fn lock(&self, board: &mut Board) {
+        for (dx, dy) in cells(self.kind) {
+            board.set(
+                (self.x + dx) as usize,
+                (self.y + dy) as usize,
+                Some(self.kind),
+            );
+        }
+    }
+}

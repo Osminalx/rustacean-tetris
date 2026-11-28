@@ -86,6 +86,13 @@ fn main() -> std::io::Result<()> {
         while acc >= GRAVITY_INTERVAL {
             if can_place(&board, &piece, piece.x, piece.y + 1) {
                 piece.y += 1;
+            } else {
+                piece.lock(&mut board);
+                piece = Piece {
+                    kind: Cell::T,
+                    x: 6,
+                    y: 2,
+                }
             }
             acc -= GRAVITY_INTERVAL;
         }
